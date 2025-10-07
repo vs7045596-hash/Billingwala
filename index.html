@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Billing App</title>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    input, button { padding: 8px; margin: 5px; }
+    .invoice { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <h1>📄 Billing App</h1>
+  
+  <h3>Create Invoice</h3>
+  <input id="customer" placeholder="Customer Name">
+  <input id="amount" placeholder="Amount" type="number">
+  <input id="date" placeholder="Date" type="date">
+  <button onclick="addInvoice()">Add Invoice</button>
+  
+  <h3>Invoices</h3>
+  <div id="invoices"></div>
+
+  <script>
+    async function loadInvoices() {
+      let res = await fetch("/invoices");
+      let data = await res.json();
+      let container = document.getElementById("invoices");
+      container.innerHTML = "";
+      data.forEach(inv => {
+        container.innerHTML += `<div class="invoice">
+          <b>${inv.customer}</b><br>
+          💰 ${inv.amount} | 📅 ${inv.date}
+        </div>`;
+      });
+    }
+
+    async function addInvoice() {
+      let customer = document.getElementById("customer").value;
+      let amount = document.getElementById("amount").value;
+      let date = document.getElementById("date").value;
+      await fetch("/invoice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customer, amount, date })
+      });
+      loadInvoices();
+    }
+
+    loadInvoices();
+  </script>
+</body>
+  </html>
